@@ -5,6 +5,7 @@
 #include "expr.h"
 #include "parser.h"
 
+
 struct state
 {
 	char* start;
@@ -60,12 +61,10 @@ int set_constant(struct state* s, char* start, int len)
 
 	for (int i = 0; i < constants_len; i++)
 	{
-		if (memcmp(start, constants[i].name, len) == 0)
-		{
-			s->value = constants[i].value;
-			s->type  = CONSTANT;
-			return 1;
-		}
+		if (memcmp(start, constants[i].name, len) != 0) continue;
+		s->value = constants[i].value;
+		s->type  = constants[i].type;
+		return 1;
 	}
 	return 0;
 }
@@ -87,16 +86,15 @@ int set_function(struct state* s, char* start, int len)
 
 	for (int i = 0; i < functions_len; i++)
 	{
-		if (memcmp(start, functions[i].name, len) == 0)
-		{
-			if (functions[i].type == FUNCTION1)
-				s->fun1 = functions[i].fun;
-			else
-				s->fun2 = functions[i].fun;
+		if (memcmp(start, functions[i].name, len) != 0) continue;
 
-			s->type = functions[i].type;
-			return 1;
-		}
+		if (functions[i].type == FUNCTION1)
+			s->fun1 = functions[i].fun;
+		else
+			s->fun2 = functions[i].fun;
+
+		s->type = functions[i].type;
+		return 1;
 	}
 	return 0;
 }
@@ -129,12 +127,12 @@ void next_token(struct state* s)
 		// ignore spaces
 		switch (s->next++[0])
 		{
-			case '+': s->type = ADD;  s->fun2 = add;    return;
-			case '-': s->type = SUB;  s->fun2 = sub;    return;
-			case '*': s->type = MULT; s->fun2 = mult;   return;
-			case '/': s->type = DIV;  s->fun2 = divide; return;
-			case '%': s->type = MOD;  s->fun2 = fmod;   return;
-			case '^': s->type = EXP;  s->fun2 = pow;    return;
+			case '+': s->type = FUNCTION2; s->fun2 = add;    return;
+			case '-': s->type = FUNCTION2; s->fun2 = sub;    return;
+			case '*': s->type = FUNCTION2; s->fun2 = mult;   return;
+			case '/': s->type = FUNCTION2; s->fun2 = divide; return;
+			case '%': s->type = FUNCTION2; s->fun2 = fmod;   return;
+			case '^': s->type = FUNCTION2; s->fun2 = pow;    return;
 			case '(': s->type = LPAREN; return;
 			case ')': s->type = RPAREN; return;
 			case ',': s->type = COMMA;  return;
@@ -182,7 +180,6 @@ struct expr* base(struct state* s)
 		next_token(s);
 
 		ret = expression(s);
-
 		if (!ret) return NULL;
 		if (s->type != RPAREN) return NULL;
 		next_token(s);
@@ -200,7 +197,6 @@ struct expr* base(struct state* s)
 		next_token(s);
 
 		ret = expression(s);
-
 		if (!ret) return NULL;
 		if (s->type != COMMA) return NULL;
 		next_token(s);
@@ -211,6 +207,7 @@ struct expr* base(struct state* s)
 		if (!ret->right) return NULL;
 
 		if (s->type != RPAREN) return NULL;
+		
 		ret->fun2 = fun2;
 		next_token(s);
 		return ret;
@@ -220,12 +217,12 @@ struct expr* base(struct state* s)
 
 struct expr* unary(struct state* s)
 {
-	if (s->type == ADD)
+	if (s->type == FUNCTION2 && s->fun2 == add)
 	{
 		next_token(s);
 		return unary(s);
 	}
-	if (s->type == SUB)
+	if (s->type == FUNCTION2 && s->fun2 == sub)
 	{
 		next_token(s);
 		struct expr* ret;
@@ -243,7 +240,7 @@ struct expr* power(struct state* s)
 	struct expr* ret = unary(s);
 	if (!ret) return NULL;
 
-	while (s->type == EXP)
+	while (s->type == FUNCTION2 && s->fun2 == pow)
 	{
 		next_token(s);
 		ret = init_expr(EXP, ret, unary(s));
@@ -261,7 +258,9 @@ struct expr* term(struct state* s)
 	void* fun2;
 	int t;
 
-	while (s->type == MULT || s->type == DIV || s->type == MOD)
+	while (s->type == FUNCTION2 && (s->fun2 == mult   || 
+									s->fun2 == divide || 
+									s->fun2 == fmod))
 	{
 		fun2 = s->fun2;
 		t    = s->type;
@@ -281,7 +280,7 @@ struct expr* expression(struct state* s)
 	void* fun2;
 	int t;
 
-	while (s->type == ADD || s->type == SUB)
+	while (s->type == FUNCTION2 && (s->fun2 == add || s->fun2 == sub))
 	{
 		fun2 = s->fun2;
 		t    = s->type;

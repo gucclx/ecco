@@ -207,7 +207,7 @@ struct expr* base(struct state* s)
 		if (!ret->right) return NULL;
 
 		if (s->type != RPAREN) return NULL;
-		
+
 		ret->fun2 = fun2;
 		next_token(s);
 		return ret;
@@ -228,7 +228,7 @@ struct expr* unary(struct state* s)
 		struct expr* ret;
 		ret = unary(s);
 		if (!ret) return NULL;
-		ret = init_expr(NEGATE, ret, NULL);
+		ret = init_expr(FUNCTION1, ret, NULL);
 		ret->fun1 = negate;
 		return ret;
 	}
@@ -243,7 +243,7 @@ struct expr* power(struct state* s)
 	while (s->type == FUNCTION2 && s->fun2 == pow)
 	{
 		next_token(s);
-		ret = init_expr(EXP, ret, unary(s));
+		ret = init_expr(FUNCTION2, ret, unary(s));
 		if (!ret->right) return NULL;
 		ret->fun2 = pow;
 	}

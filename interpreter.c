@@ -1,5 +1,6 @@
 #include "expr.h"
 #include "interpreter.h"
+#include <math.h>
 
 
 // interpret is never supposed to get an invalid type.
@@ -15,4 +16,5 @@ double interpret(struct expr* root)
 		case FUNCTION1: return (*root->fun1)(interpret(root->left));
 		case FUNCTION2: return (*root->fun2)(interpret(root->left), interpret(root->right));
 	}
+	return NAN;
 }

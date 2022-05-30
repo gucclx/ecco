@@ -40,14 +40,14 @@ double glog(double b, double x)
 	return log(x)/log(b);
 }
 
-struct pair
+struct identifier
 {
 	char* name;
 	int type;
 	union {double value; void* fun;};
 };
 
-static struct pair constants[] = 
+struct identifier constants[] =
 { 
 	{.name = "e",  .type = CONSTANT, .value = M_E}, 
 	{.name = "pi", .type = CONSTANT, .value = M_PI} 
@@ -69,7 +69,7 @@ int set_constant(struct state* s, char* start, int len)
 	return 0;
 }
 
-static struct pair functions[] = 
+struct identifier functions[] = 
 {
 	{.name = "ln",   .type = FUNCTION1, .fun = log},
 	{.name = "log",  .type = FUNCTION2, .fun = glog},
@@ -167,7 +167,9 @@ struct expr* base(struct state* s)
 	{
 		next_token(s);
 		ret = expression(s);
+		if (!ret) return NULL;
 		if (s->type != RPAREN) return NULL;
+		
 		next_token(s);
 		return ret;
 	}

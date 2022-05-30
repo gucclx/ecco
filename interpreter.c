@@ -3,9 +3,8 @@
 #include <math.h>
 
 
-// interpret is never supposed to get an invalid type.
-// if something like 1/0 happens, it returns NAN.
-
+// NAN is returned if an invalid operation happens.
+// +-inf is returned if a value is too large.
 // the argument of function1 is assumed to always be
 // root->left.
 double interpret(struct expr* root)

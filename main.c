@@ -35,7 +35,7 @@ int main()
 
 		double res = interpret(expr_tree);
 
-		if (isnan(res))
+		if (isnan(res) || isinf(res))
 		{
 			printf("MATH ERROR\n");
 			free_expr(expr_tree);

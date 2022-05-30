@@ -3,7 +3,8 @@
 #include <math.h>
 
 
-// NAN is returned if an invalid operation happens.
+// NAN is returned if an invalid operation happens 
+// or if the root type is somehow invalid
 // +-inf is returned if a value is too large.
 // the argument of function1 is assumed to always be
 // root->left.

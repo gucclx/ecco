@@ -53,7 +53,7 @@ struct identifier constants[] =
 	{.name = "pi", .type = CONSTANT, .value = M_PI} 
 };
 
-int set_constant(struct state* s, char* start, int len)
+int set_constant(struct state* s, char* start, size_t len)
 {
 	if (len == 0) return 0;
 
@@ -79,7 +79,7 @@ struct identifier functions[] =
 	{.name = "sqrt", .type = FUNCTION1, .fun = sqrt}
 };
 
-int set_function(struct state* s, char* start, int len)
+int set_function(struct state* s, char* start, size_t len)
 {
 	if (len == 0) return 0;
 

@@ -12,7 +12,7 @@ Program that interprets math expressions such as 2 * 2 + 1 / sin(pi / 2) * e
 
 expression -> term (('+' | '-') term)*
 
-term       -> power (('*' | '/' | '%') power)*
+term       -> power (('\*' | '/' | '%') power)*
 
 power      -> unary ('^' unary)*
 

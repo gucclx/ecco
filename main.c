@@ -18,7 +18,7 @@ int main()
 	{
 		printf("> ");
 
-		if (getline(&input, &input_size, stdin) == 1) break;
+		if (getline(&input, &input_size, stdin) <= 1) break;
 
 		expr_tree = parse(input);
 

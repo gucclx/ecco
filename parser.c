@@ -35,8 +35,8 @@ double divide(double x, double y)
 
 double glog(double b, double x)
 {
-	if (b <= 1) return NAN;
-	if (x <= 0) return NAN;
+	if (b <= 1.0) return NAN;
+	if (x <= 0.0) return NAN;
 	return log(x)/log(b);
 }
 
@@ -61,6 +61,7 @@ int set_constant(struct state* s, char* start, int len)
 
 	for (int i = 0; i < constants_len; i++)
 	{
+		if (strlen(constants[i].name) != len) continue;
 		if (memcmp(start, constants[i].name, len) != 0) continue;
 		s->value = constants[i].value;
 		s->type  = constants[i].type;
@@ -86,6 +87,7 @@ int set_function(struct state* s, char* start, int len)
 
 	for (int i = 0; i < functions_len; i++)
 	{
+		if (strlen(functions[i].name) != len) continue;
 		if (memcmp(start, functions[i].name, len) != 0) continue;
 
 		if (functions[i].type == FUNCTION1)
@@ -109,14 +111,14 @@ void next_token(struct state* s)
 		s->start = s->next;
 
 		// end of input string
-		if (!*s->next)
+		if (!s->next[0])
 		{
 			s->type = END;
 			return;
 		}
 
 		// try to find a number
-		if (*s->next >= '0' && *s->next <= '9')
+		if (s->next[0] >= '0' && s->next[0] <= '9')
 		{
 			s->value = strtod(s->start, &s->next);
 			s->type  = CONSTANT;
@@ -142,8 +144,8 @@ void next_token(struct state* s)
 		// try to find identifier
 		// such as a constant's name
 		// or a function's name
-		while (isalpha(*s->next)) s->next++;
-		while (isdigit(*s->next) || *s->next == '_') s->next++;
+		while (isalpha(s->next[0])) s->next++;
+		while (isdigit(s->next[0]) || s->next[0] == '_') s->next++;
 
 
 		if (set_constant(s, s->start, s->next-s->start)) return;
